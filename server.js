@@ -1,9 +1,10 @@
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config(); // ✅ Correct dotenv usage
+}
+
 const express = require("express");
 const app = express();
-const port = 3000;
 const expressLayouts = require("express-ejs-layouts");
-
-const indexRouters = require("./routes/index");
 
 // Set EJS as the templating engine
 app.set("view engine", "ejs");
@@ -16,14 +17,18 @@ app.use(express.static("public"));
 
 // Connection to MongoDB
 const mongoose = require("mongoose");
-mongoose.connect(process.env.Database_URL, {
-    useNewUrlparser: true })
-const db = mongoose.connection
-db.on('error', error => console.error(error))
-db.once('open', () => console.log('Connected to Mongoose'))
 
+mongoose.connect(process.env.DATABASE_URL)
+    .then(() => console.log("Connected to Mongoose"))
+    .catch(error => console.error("MongoDB connection error:", error));
 
+const db = mongoose.connection;
+db.on("error", console.error); // Logs errors directly
+
+// Import routes
+const indexRouters = require("./routes/index");
 app.use("/", indexRouters);
 
 // Start the server
-app.listen(process.env.PORT || 3000)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
