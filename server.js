@@ -1,23 +1,20 @@
 const express = require("express");
+const path = require("path");
 const app = express();
-const port = 3000;
-const expressLayouts = require("express-ejs-layouts");
 
 // Set EJS as the templating engine
 app.set("view engine", "ejs");
-app.use(expressLayouts);
-app.set("views", __dirname + "/views");
-app.set("layout", "layouts/main"); // Main layout file
+app.set("views", path.join(__dirname, "views")); // ✅ Correct way to set views path
 
-// Middleware to serve static files (CSS, JS, Images)
+// Middleware
 app.use(express.static("public"));
 
-// Routes
-app.get("/", (req, res) => {
-    res.render("index", { title: "Home Page" });
-});
+// Import routes
+const indexRouter = require("./routes/index");
+app.use("/", indexRouter);
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
 });
